@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SupeRR Selector 2 | IPL 2027 Auction Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --rr-pink: #E91E8C;
+    --rr-blue: #254AA5;
+    --rr-gold: #FFD700;
+    --dark-bg: #0D0D1A;
+    --card-bg: #1A1A2E;
+    --surface: #252547;
+    --highlight: #FF6B6B;
+    --green: #00D4AA;
+    --text: #E8E8F0;
+    --text-muted: #9898B0;
+    --border: rgba(233,30,140,0.2);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; background: var(--dark-bg); color: var(--text); font-family: 'Rajdhani', sans-serif; overflow-x: hidden; }
+
+  /* ===== SCROLLBAR ===== */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--dark-bg); }
+  ::-webkit-scrollbar-thumb { background: var(--rr-pink); border-radius: 3px; }
+
+  /* ===== HEADER ===== */
+  .header {
+    background: linear-gradient(135deg, #0D0D1A 0%, #1A1A2E 40%, #0a0a2e 100%);
+    border-bottom: 2px solid var(--rr-pink);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 30px rgba(233,30,140,0.3);
+  }
+  .header-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .rr-emblem {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--rr-pink), var(--rr-blue));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 20px;
+    color: #fff;
+    box-shadow: 0 0 20px rgba(233,30,140,0.5);
+    flex-shrink: 0;
+    border: 2px solid var(--rr-gold);
+  }
+  .title-block h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(14px, 2.5vw, 22px);
+    font-weight: 900;
+    background: linear-gradient(90deg, var(--rr-pink), var(--rr-gold), var(--rr-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 1px;
+    line-height: 1.2;
+  }
+  .title-block p {
+    font-size: clamp(10px, 1.5vw, 13px);
+    color: var(--text-muted);
+    margin-top: 2px;
+    letter-spacing: 0.5px;
+  }
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(233,30,140,0.1);
+    border: 1px solid var(--rr-pink);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: var(--rr-pink);
+  }
+  .pdf-header-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, var(--rr-pink), var(--rr-blue));
+    color: #fff;
+    text-decoration: none;
+    border-radius: 20px;
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(255,215,0,0.4);
+    box-shadow: 0 0 15px rgba(233,30,140,0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+  }
+  .pdf-header-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 22px rgba(233,30,140,0.6);
+    color: #FFD700;
+  }
+  .pulse-dot {
+    width: 10px;
+    height: 10px;
+    background: var(--rr-pink);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+    flex-shrink: 0;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(233,30,140,0.7); transform: scale(1); }
+    50% { box-shadow: 0 0 0 8px rgba(233,30,140,0); transform: scale(1.1); }
+  }
+  .stats-strip {
+    background: linear-gradient(90deg, rgba(37,74,165,0.3), rgba(233,30,140,0.3));
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding: 8px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    flex-wrap: wrap;
+  }
+  .stat-item { color: var(--text-muted); }
+  .stat-item span { color: var(--rr-gold); font-weight: 700; }
+  .stat-sep { color: rgba(233,30,140,0.5); }
+
+  /* ===== NAV TABS ===== */
+  .nav-tabs {
+    display: flex;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    padding: 14px 24px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--text-muted);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.3s;
+    white-space: nowrap;
+    position: relative;
+  }
+  .tab-btn:hover { color: var(--text); border-bottom-color: rgba(233,30,140,0.4); }
+  .tab-btn.active {
+    color: var(--rr-pink);
+    border-bottom-color: var(--rr-pink);
+    text-shadow: 0 0 12px rgba(233,30,140,0.4);
+  }
+
+  /* ===== TAB PANELS ===== */
+  .tab-panel { display: none; padding: 24px; animation: fadeIn 0.3s ease; }
+  .tab-panel.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ===== KPI CARDS ===== */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .kpi-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--rr-pink), var(--rr-blue));
+  }
+  .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(233,30,140,0.2); }
+  .kpi-icon { font-size: 28px; margin-bottom: 8px; }
+  .kpi-value {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(22px, 3vw, 32px);
+    font-weight: 700;
+    color: var(--rr-gold);
+    line-height: 1;
+  }
+  .kpi-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .kpi-sub { font-size: 14px; color: var(--rr-pink); font-weight: 600; margin-top: 2px; }
+
+  /* ===== CARDS / PANELS ===== */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+  .card-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(13px, 2vw, 16px);
+    font-weight: 700;
+    color: var(--rr-pink);
+    margin-bottom: 16px;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 18px;
+    background: linear-gradient(to bottom, var(--rr-pink), var(--rr-blue));
+    border-radius: 2px;
+  }
+
+  /* ===== CHARTS GRID ===== */
+  .charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  .chart-wrap { position: relative; height: 380px; }
+  .chart-wrap-tall { position: relative; height: 460px; }
+  .chart-wrap-sq { position: relative; height: 420px; }
+
+  /* ===== TABLES ===== */
+  .table-wrap { overflow-x: auto; border-radius: 8px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  thead th {
+    background: var(--surface);
+    padding: 12px 10px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    transition: color 0.2s;
+  }
+  thead th:hover { color: var(--rr-pink); }
+  thead th.sorted { color: var(--rr-gold); }
+  thead th .sort-arrow { margin-left: 4px; opacity: 0.5; }
+  thead th.sorted .sort-arrow { opacity: 1; }
+  tbody tr {
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: background 0.2s;
+  }
+  tbody tr:hover { background: rgba(233,30,140,0.08) !important; }
+  tbody td { padding: 10px 10px; vertical-align: middle; }
+  .rr-row { background: rgba(233,30,140,0.06) !important; }
+  .rr-row td:nth-child(2) { color: var(--rr-pink); font-weight: 700; }
+  .rank-cell {
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+  .rank-cell.top3 { color: var(--rr-gold); }
+  .ppi-cell {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    color: var(--rr-gold);
+    font-size: 14px;
+  }
+  .rr-badge { font-size: 16px; }
+
+  /* economy coloring */
+  .econ-green { color: var(--green); font-weight: 700; }
+  .econ-yellow { color: var(--rr-gold); font-weight: 600; }
+  .econ-red { color: var(--highlight); font-weight: 600; }
+
+  /* ===== SECTION HEADER ===== */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(14px, 2.5vw, 20px);
+    font-weight: 700;
+    color: var(--text);
+  }
+  .section-title span { color: var(--rr-pink); }
+
+  /* ===== PLAYER CARDS (Recommended Picks) ===== */
+  .picks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .pick-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .pick-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(233,30,140,0.25); }
+  .pick-card::after {
+    content: '';
+    position: absolute;
+    top: -40%;
+    right: -20%;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(233,30,140,0.08), transparent);
+    border-radius: 50%;
+  }
+  .pick-player-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .pick-role { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+  .pick-flag { font-size: 22px; position: absolute; top: 18px; right: 18px; }
+  .pick-stats { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .pick-stat {
+    background: rgba(255,255,255,0.05);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+  .pick-stat strong { color: var(--rr-gold); display: block; font-size: 15px; font-family: 'Orbitron', monospace; }
+  .pick-stat span { color: var(--text-muted); font-size: 10px; }
+  .gap-badge {
+    display: inline-block;
+    background: linear-gradient(90deg, rgba(233,30,140,0.2), rgba(37,74,165,0.2));
+    border: 1px solid var(--rr-pink);
+    color: var(--rr-pink);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  /* ===== COMPARISON BARS ===== */
+  .compare-bar-wrap { margin: 6px 0; }
+  .compare-bar-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 3px; }
+  .compare-bar-track { height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; }
+  .compare-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--rr-blue), var(--rr-pink));
+    transition: width 1s ease;
+  }
+  .compare-bar-fill.global { background: linear-gradient(90deg, var(--green), var(--rr-gold)); }
+
+  /* ===== FLOATING BUTTON ===== */
+  .float-btn {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 999;
+    background: linear-gradient(135deg, var(--rr-pink), var(--rr-blue));
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 24px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(233,30,140,0.4);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .float-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(233,30,140,0.55); }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    background: var(--card-bg);
+    border-top: 1px solid var(--border);
+    padding: 16px 24px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+  }
+  .footer span { color: var(--rr-pink); }
+
+  /* ===== DIVIDER ===== */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 20px 0;
+  }
+
+  /* ===== LEGEND PILL ===== */
+  .legend-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 10px; }
+  .legend-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .header-main { padding: 10px 14px; }
+    .tab-panel { padding: 14px; }
+    .charts-grid { grid-template-columns: 1fr; }
+    .tab-btn { padding: 10px 14px; font-size: 13px; }
+    .float-btn { bottom: 14px; right: 14px; padding: 10px 16px; font-size: 13px; }
+  }
+
+  /* ===== GLOW EFFECT FOR HEADINGS ===== */
+  .glow { text-shadow: 0 0 20px rgba(233,30,140,0.4); }
+
+  /* ===== SCATTER LABELS ===== */
+  .chart-note {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: right;
+    margin-top: 6px;
+    font-style: italic;
+  }
+
+  /* squad gap section */
+  .gap-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 700px) { .gap-section { grid-template-columns: 1fr; } }
+
+  .info-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  /* animated counter */
+  .counter { display: inline-block; }
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header">
+  <div class="header-main">
+    <div class="logo-area">
+      <div class="rr-emblem">RR</div>
+      <div class="title-block">
+        <h1>SupeRR Selector 2 | IPL 2027 Auction Intelligence</h1>
+        <p>Round 1: Identifying Most Reliable Players Under Pressure</p>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <a href="RR_Auction_Strategy_2027.pdf" download="RR_Auction_Strategy_2027.pdf" target="_blank" class="pdf-header-btn">
+        📄 Download Strategy PDF
+      </a>
+      <div class="live-badge">
+        <div class="pulse-dot"></div>
+        LIVE ANALYSIS
+      </div>
+    </div>
+  </div>
+  <div class="stats-strip">
+    <div class="stat-item"><span>200,999</span> Deliveries</div>
+    <div class="stat-sep">|</div>
+    <div class="stat-item"><span>883</span> Matches</div>
+    <div class="stat-sep">|</div>
+    <div class="stat-item"><span>5</span> Seasons</div>
+    <div class="stat-sep">|</div>
+    <div class="stat-item">Period: <span>2022–2026</span></div>
+  </div>
+</header>
+
+<!-- ===== NAV TABS ===== -->
+<nav class="nav-tabs">
+  <button class="tab-btn active" onclick="switchTab('overview', this)">🏠 Overview</button>
+  <button class="tab-btn" onclick="switchTab('batters', this)">🏏 Batters</button>
+  <button class="tab-btn" onclick="switchTab('bowlers', this)">⚡ Bowlers</button>
+  <button class="tab-btn" onclick="switchTab('allrounders', this)">⭐ All-Rounders</button>
+  <button class="tab-btn" onclick="switchTab('rrsquad', this)">🩷 RR Squad</button>
+</nav>
+
+<!-- ===== TAB 1: OVERVIEW ===== -->
+<div id="tab-overview" class="tab-panel active">
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon">🏏</div>
+      <div class="kpi-value">96.2</div>
+      <div class="kpi-sub">Vaibhav Sooryavanshi</div>
+      <div class="kpi-label">Top Batter PPI</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">⚡</div>
+      <div class="kpi-value">71.1</div>
+      <div class="kpi-sub">Matthew Humphreys</div>
+      <div class="kpi-label">Top Bowler PPI</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">⭐</div>
+      <div class="kpi-value">60.5</div>
+      <div class="kpi-sub">Sunil Narine</div>
+      <div class="kpi-label">Top All-Rounder Index</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">📊</div>
+      <div class="kpi-value">200,999</div>
+      <div class="kpi-sub">5 Seasons · 883 Matches</div>
+      <div class="kpi-label">Total Deliveries Analysed</div>
+    </div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="card">
+      <div class="card-title">Top 10 Batters — Pressure Performance Index</div>
+      <div class="legend-row">
+        <div class="legend-pill"><div class="legend-dot" style="background:var(--rr-pink)"></div>RR Player</div>
+        <div class="legend-pill"><div class="legend-dot" style="background:var(--rr-blue)"></div>Global Pool</div>
+      </div>
+      <div class="chart-wrap-tall"><canvas id="chartBatterOverview"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Top 10 Bowlers — Bowling Pressure Index</div>
+      <div class="legend-row">
+        <div class="legend-pill"><div class="legend-dot" style="background:var(--rr-pink)"></div>RR Player</div>
+        <div class="legend-pill"><div class="legend-dot" style="background:var(--rr-blue)"></div>Global Pool</div>
+      </div>
+      <div class="chart-wrap-tall"><canvas id="chartBowlerOverview"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TAB 2: BATTERS ===== -->
+<div id="tab-batters" class="tab-panel">
+  <div class="section-header">
+    <div class="section-title">Top 10 Batters — <span>Pressure Performance Index</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Player Rankings (Click Column to Sort)</div>
+    <div class="table-wrap">
+      <table id="batterTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable('batterTable', 0, true)" class="sorted">Rank <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('batterTable', 1, false)">Player <span class="sort-arrow">↕</span></th>
+            <th>RR</th>
+            <th onclick="sortTable('batterTable', 3, true)">PPI <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('batterTable', 4, true)">Runs <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('batterTable', 5, true)">Avg <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('batterTable', 6, true)">SR <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('batterTable', 7, true)">Death SR <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('batterTable', 8, true)">PP SR <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('batterTable', 9, true)">Chase SR <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('batterTable', 10, true)">KO SR <span class="sort-arrow">↕</span></th>
+          </tr>
+        </thead>
+        <tbody id="batterTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="card">
+      <div class="card-title">Pressure Phase Strike Rates — Death vs PP vs Chase</div>
+      <div class="chart-wrap-tall"><canvas id="chartBatterPhases"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Top 5 Batters — Radar: All Pressure Phases</div>
+      <div class="chart-wrap-tall"><canvas id="chartBatterRadar"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TAB 3: BOWLERS ===== -->
+<div id="tab-bowlers" class="tab-panel">
+  <div class="section-header">
+    <div class="section-title">Top 10 Bowlers — <span>Bowling Pressure Index</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Player Rankings (Click Column to Sort)</div>
+    <div class="legend-row">
+      <div class="legend-pill"><div class="legend-dot" style="background:var(--green)"></div>Economy &lt; 7.5 (Excellent)</div>
+      <div class="legend-pill"><div class="legend-dot" style="background:var(--rr-gold)"></div>7.5–8.5 (Good)</div>
+      <div class="legend-pill"><div class="legend-dot" style="background:var(--highlight)"></div>&gt; 8.5 (Expensive)</div>
+    </div>
+    <div class="table-wrap">
+      <table id="bowlerTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable('bowlerTable', 0, true)" class="sorted">Rank <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('bowlerTable', 1, false)">Player <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('bowlerTable', 2, true)">PPI <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('bowlerTable', 3, true)">Wickets <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('bowlerTable', 4, true)">Economy <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('bowlerTable', 5, true)">Avg <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('bowlerTable', 6, true)">Death Econ <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('bowlerTable', 7, true)">PP Econ <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('bowlerTable', 8, true)">Death Wkts <span class="sort-arrow">↕</span></th>
+          </tr>
+        </thead>
+        <tbody id="bowlerTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="card">
+      <div class="card-title">Economy Breakdown — Death vs PP vs Overall (Lower = Better)</div>
+      <div class="chart-wrap-tall"><canvas id="chartBowlerEcon"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Economy vs Bowling Pressure Index — Scatter</div>
+      <div class="chart-wrap-tall"><canvas id="chartBowlerScatter"></canvas></div>
+      <div class="chart-note">Lower economy + higher PPI = top-right quadrant is ideal</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TAB 4: ALL-ROUNDERS ===== -->
+<div id="tab-allrounders" class="tab-panel">
+  <div class="section-header">
+    <div class="section-title">Top 10 All-Rounders — <span>Composite Index</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Batting PPI vs Bowling PPI — Bubble Size = AR Index</div>
+    <div class="legend-row">
+      <div class="legend-pill"><div class="legend-dot" style="background:var(--rr-pink)"></div>Bat-dominant</div>
+      <div class="legend-pill"><div class="legend-dot" style="background:var(--rr-blue)"></div>Bowl-dominant</div>
+      <div class="legend-pill"><div class="legend-dot" style="background:var(--rr-gold)"></div>Balanced</div>
+    </div>
+    <div class="chart-wrap" style="height:480px"><canvas id="chartARBubble"></canvas></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">All-Rounders Leaderboard</div>
+    <div class="table-wrap">
+      <table id="arTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable('arTable',0,true)" class="sorted">Rank <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('arTable',1,false)">Player <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('arTable',2,true)">AR Index <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('arTable',3,true)">Bat PPI <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('arTable',4,true)">Bowl PPI <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('arTable',5,true)">Bat SR <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('arTable',6,true)">Economy <span class="sort-arrow">↕</span></th>
+            <th>Role</th>
+          </tr>
+        </thead>
+        <tbody id="arTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TAB 5: RR SQUAD ===== -->
+<div id="tab-rrsquad" class="tab-panel">
+  <div class="section-header">
+    <div class="section-title">🩷 Rajasthan Royals — <span>Squad Analysis & Auction Gaps</span></div>
+  </div>
+
+  <div class="gap-section">
+    <div class="card">
+      <div class="card-title">RR Batting PPI vs Global Top 10</div>
+      <div class="chart-wrap"><canvas id="chartRRBatComp"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">RR Bowling Death Economy vs Global Elite</div>
+      <div class="chart-wrap"><canvas id="chartRRBowlGap"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">RR Current Squad — Batting Unit</div>
+    <div class="chart-wrap" style="height:320px"><canvas id="chartRRBatUnit"></canvas></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">RR Current Squad — Bowling Unit</div>
+    <div class="chart-wrap" style="height:320px"><canvas id="chartRRBowlUnit"></canvas></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🎯 Recommended Auction Picks — IPL 2027</div>
+    <div class="info-label">Players identified to fill RR's specific performance gaps under pressure</div>
+    <div class="picks-grid">
+
+      <div class="pick-card">
+        <div class="pick-flag">🇦🇺</div>
+        <div class="pick-player-name">Tim David</div>
+        <div class="pick-role">Power Hitter · RHB · Singapore/Australia</div>
+        <div class="pick-stats">
+          <div class="pick-stat"><strong>66.3</strong><span>Bat PPI</span></div>
+          <div class="pick-stat"><strong>2178</strong><span>Runs</span></div>
+          <div class="pick-stat"><strong>184.8</strong><span>Death SR</span></div>
+          <div class="pick-stat"><strong>34.6</strong><span>Avg</span></div>
+        </div>
+        <div class="gap-badge">🔥 Addresses Death-Over Batting Gap</div>
+      </div>
+
+      <div class="pick-card">
+        <div class="pick-flag">🇵🇰</div>
+        <div class="pick-player-name">Mohammad Nawaz</div>
+        <div class="pick-role">All-Rounder · SLA / LHB</div>
+        <div class="pick-stats">
+          <div class="pick-stat"><strong>68.0</strong><span>Bowl PPI</span></div>
+          <div class="pick-stat"><strong>67</strong><span>Wickets</span></div>
+          <div class="pick-stat"><strong>6.96</strong><span>Economy</span></div>
+          <div class="pick-stat"><strong>54.0</strong><span>AR Index</span></div>
+        </div>
+        <div class="gap-badge">⚡ Bowling All-Rounder Upgrade</div>
+      </div>
+
+      <div class="pick-card">
+        <div class="pick-flag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</div>
+        <div class="pick-player-name">Phil Salt</div>
+        <div class="pick-role">Opener · RHB · England</div>
+        <div class="pick-stats">
+          <div class="pick-stat"><strong>66.2</strong><span>Bat PPI</span></div>
+          <div class="pick-stat"><strong>2782</strong><span>Runs</span></div>
+          <div class="pick-stat"><strong>202.0</strong><span>Death SR</span></div>
+          <div class="pick-stat"><strong>162.9</strong><span>PP SR</span></div>
+        </div>
+        <div class="gap-badge">📈 Powerplay Aggression Boost</div>
+      </div>
+
+      <div class="pick-card">
+        <div class="pick-flag">🇮🇳</div>
+        <div class="pick-player-name">Jasprit Bumrah</div>
+        <div class="pick-role">Pacer · RHB (Tail) · India</div>
+        <div class="pick-stats">
+          <div class="pick-stat"><strong>66.1</strong><span>Bowl PPI</span></div>
+          <div class="pick-stat"><strong>94</strong><span>Wickets</span></div>
+          <div class="pick-stat"><strong>6.64</strong><span>Economy</span></div>
+          <div class="pick-stat"><strong>47</strong><span>Death Wkts</span></div>
+        </div>
+        <div class="gap-badge">🎯 Elite Death Bowling — Critical Gap</div>
+      </div>
+
+      <div class="pick-card">
+        <div class="pick-flag">🇦🇫</div>
+        <div class="pick-player-name">Rashid Khan</div>
+        <div class="pick-role">Spinner All-Rounder · LBG · Afghanistan</div>
+        <div class="pick-stats">
+          <div class="pick-stat"><strong>64.1</strong><span>Bowl PPI</span></div>
+          <div class="pick-stat"><strong>159</strong><span>Wickets</span></div>
+          <div class="pick-stat"><strong>7.25</strong><span>Economy</span></div>
+          <div class="pick-stat"><strong>49.6</strong><span>AR Index</span></div>
+        </div>
+        <div class="gap-badge">🌀 Spin Bowling + Batting Depth</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ===== FLOATING BUTTON ===== -->
+<a href="RR_Auction_Strategy_2027.pdf" download="RR_Auction_Strategy_2027.pdf" target="_blank" class="float-btn">
+  <span>⬇</span> Download Strategy PDF
+</a>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <span>SupeRR Selector Season 2</span> | Rajasthan Royals Proprietary Data | Analysis by Vaibhav Shukla
+</footer>
+
+<script>
+// =====================================================================
+// DATA
+// =====================================================================
+const batters = [
+  {rank:1, name:'Vaibhav Sooryavanshi', ppi:96.2, runs:1509, avg:43.1, sr:211.3, deathSR:290.0, ppSR:207.3, chaseSR:218.3, koSR:245.7, inRR:true},
+  {rank:2, name:'Tim David',            ppi:66.3, runs:2178, avg:34.6, sr:168.4, deathSR:184.8, ppSR:188.7, chaseSR:172.7, koSR:100.0, inRR:false},
+  {rank:3, name:'Phil Salt',            ppi:66.2, runs:2782, avg:36.6, sr:163.6, deathSR:202.0, ppSR:162.9, chaseSR:166.3, koSR:194.6, inRR:false},
+  {rank:4, name:'Abhishek Sharma',      ppi:64.9, runs:4332, avg:33.3, sr:177.8, deathSR:160.0, ppSR:176.6, chaseSR:177.7, koSR:103.6, inRR:false},
+  {rank:5, name:'Travis Head',          ppi:64.7, runs:1975, avg:30.4, sr:167.1, deathSR:185.7, ppSR:173.5, chaseSR:169.9, koSR:127.5, inRR:false},
+  {rank:6, name:'Prabhsimran Singh',    ppi:63.5, runs:1878, avg:30.8, sr:156.2, deathSR:230.8, ppSR:153.1, chaseSR:155.8, koSR:127.8, inRR:false},
+  {rank:7, name:'Suryakumar Yadav',     ppi:63.3, runs:4595, avg:38.6, sr:161.2, deathSR:208.0, ppSR:136.9, chaseSR:162.6, koSR:156.4, inRR:false},
+  {rank:8, name:'Finn Allen',           ppi:62.2, runs:1455, avg:29.1, sr:167.0, deathSR:185.7, ppSR:152.8, chaseSR:166.0, koSR:200.0, inRR:false},
+  {rank:9, name:'Dinesh Karthik',       ppi:61.6, runs:1069, avg:28.1, sr:156.5, deathSR:171.9, ppSR:194.1, chaseSR:164.1, koSR:120.0, inRR:false},
+  {rank:10,name:'Yashasvi Jaiswal',     ppi:61.3, runs:2927, avg:35.3, sr:151.2, deathSR:198.0, ppSR:158.2, chaseSR:154.8, koSR:135.8, inRR:true},
+];
+
+const bowlers = [
+  {rank:1, name:'Matthew Humphreys', ppi:71.1, wickets:21,  economy:6.65, avg:16.6, deathEcon:4.60,  ppEcon:7.41, deathWkts:7,  inRR:false},
+  {rank:2, name:'Mohammad Nawaz',    ppi:68.0, wickets:67,  economy:6.96, avg:17.6, deathEcon:5.53,  ppEcon:7.87, deathWkts:4,  inRR:false},
+  {rank:3, name:'Sunil Narine',      ppi:67.0, wickets:68,  economy:6.66, avg:25.4, deathEcon:5.84,  ppEcon:7.80, deathWkts:19, inRR:false},
+  {rank:4, name:'Jasprit Bumrah',    ppi:66.1, wickets:94,  economy:6.64, avg:21.0, deathEcon:7.03,  ppEcon:6.53, deathWkts:47, inRR:false},
+  {rank:5, name:'Shadab Khan',       ppi:65.6, wickets:37,  economy:7.61, avg:29.1, deathEcon:6.17,  ppEcon:5.00, deathWkts:5,  inRR:false},
+  {rank:6, name:'Abrar Ahmed',       ppi:64.8, wickets:47,  economy:6.46, avg:17.8, deathEcon:6.42,  ppEcon:8.34, deathWkts:9,  inRR:false},
+  {rank:7, name:'Rashid Khan',       ppi:64.1, wickets:159, economy:7.25, avg:21.1, deathEcon:8.14,  ppEcon:7.85, deathWkts:59, inRR:false},
+  {rank:8, name:'Matheesha Pathirana',ppi:63.6, wickets:89,  economy:6.94, avg:16.6, deathEcon:7.35,  ppEcon:7.93, deathWkts:57, inRR:false},
+  {rank:9, name:'Saim Ayub',         ppi:63.1, wickets:28,  economy:6.80, avg:21.2, deathEcon:6.50,  ppEcon:8.12, deathWkts:2,  inRR:false},
+  {rank:10,name:'Arshdeep Singh',    ppi:62.7, wickets:211, economy:8.11, avg:22.0, deathEcon:8.64,  ppEcon:7.79, deathWkts:99, inRR:false},
+];
+
+const allrounders = [
+  {rank:1,  name:'Sunil Narine',     arIndex:60.5, batPPI:53.9, bowlPPI:67.0, batSR:156.3, economy:6.66},
+  {rank:2,  name:'Mohammad Nawaz',   arIndex:54.0, batPPI:40.1, bowlPPI:68.0, batSR:134.8, economy:6.96},
+  {rank:3,  name:'Saim Ayub',        arIndex:52.9, batPPI:42.7, bowlPPI:63.1, batSR:131.7, economy:6.80},
+  {rank:4,  name:'Shadab Khan',      arIndex:52.0, batPPI:38.4, bowlPPI:65.6, batSR:136.6, economy:7.61},
+  {rank:5,  name:'William Jacks',    arIndex:51.0, batPPI:52.2, bowlPPI:49.9, batSR:146.2, economy:7.98},
+  {rank:6,  name:'Rashid Khan',      arIndex:49.6, batPPI:35.1, bowlPPI:64.1, batSR:146.5, economy:7.25},
+  {rank:7,  name:'Abhishek Sharma',  arIndex:49.3, batPPI:64.9, bowlPPI:33.6, batSR:177.8, economy:8.63},
+  {rank:8,  name:'Axar Patel',       arIndex:49.3, batPPI:39.1, bowlPPI:59.4, batSR:130.7, economy:7.67},
+  {rank:9,  name:'Mitchell Marsh',   arIndex:49.1, batPPI:54.9, bowlPPI:43.2, batSR:151.2, economy:7.82},
+  {rank:10, name:'Sikandar Raza',    arIndex:48.7, batPPI:43.2, bowlPPI:54.2, batSR:129.7, economy:6.76},
+];
+
+const rrBatters = [
+  {name:'Vaibhav Sooryavanshi', ppi:96.2, sr:211.3, avg:43.1, deathSR:290.0, ppSR:207.3},
+  {name:'Yashasvi Jaiswal',    ppi:61.3, sr:151.2, avg:35.3, deathSR:198.0, ppSR:158.2},
+  {name:'Donovan Ferreira',    ppi:56.8, sr:158.8, avg:23.4, deathSR:198.4, ppSR:130.4},
+  {name:'Dhruv Jurel',         ppi:47.7, sr:146.5, avg:29.4, deathSR:165.1, ppSR:158.3},
+  {name:'Shimron Hetmyer',     ppi:42.4, sr:144.6, avg:26.3, deathSR:156.6, ppSR:152.6},
+  {name:'Riyan Parag',         ppi:42.0, sr:145.3, avg:27.4, deathSR:158.0, ppSR:140.6},
+  {name:'Ravindra Jadeja',     ppi:39.3, sr:129.1, avg:33.2, deathSR:142.4, ppSR:159.1},
+  {name:'Sam Curran',          ppi:31.1, sr:125.5, avg:24.4, deathSR:149.8, ppSR:108.0},
+  {name:'Dasun Shanaka',       ppi:25.3, sr:134.0, avg:20.8, deathSR:156.9, ppSR:45.5},
+];
+
+const rrBowlers = [
+  {name:'Ravi Bishnoi',      ppi:53.0, economy:7.71, wickets:130, deathEcon:9.46, ppEcon:7.38},
+  {name:'Ravindra Jadeja',   ppi:48.2, economy:7.61, wickets:60,  deathEcon:10.3, ppEcon:6.00},
+  {name:'Nandre Burger',     ppi:45.3, economy:8.63, wickets:22,  deathEcon:7.70, ppEcon:8.31},
+  {name:'Jofra Archer',      ppi:44.8, economy:8.23, wickets:81,  deathEcon:9.12, ppEcon:8.17},
+  {name:'Dasun Shanaka',     ppi:43.9, economy:8.10, wickets:27,  deathEcon:8.31, ppEcon:8.83},
+  {name:'Sandeep Sharma',    ppi:42.4, economy:8.22, wickets:49,  deathEcon:9.98, ppEcon:7.21},
+  {name:'Adam Milne',        ppi:41.9, economy:8.42, wickets:36,  deathEcon:9.41, ppEcon:7.95},
+  {name:'Sam Curran',        ppi:39.6, economy:8.81, wickets:64,  deathEcon:9.35, ppEcon:8.47},
+  {name:'Tushar Deshpande',  ppi:38.7, economy:8.76, wickets:59,  deathEcon:9.67, ppEcon:8.17},
+];
+
+// =====================================================================
+// COLOUR HELPERS
+// =====================================================================
+const RR_PINK  = '#E91E8C';
+const RR_BLUE  = '#254AA5';
+const RR_GOLD  = '#FFD700';
+const GREEN    = '#00D4AA';
+const HIGHLIGHT= '#FF6B6B';
+const GRID_COLOR = 'rgba(255,255,255,0.08)';
+const TICK_COLOR = 'rgba(232,232,240,0.6)';
+
+function barColor(isRR) { return isRR ? RR_PINK : RR_BLUE; }
+
+function econColor(val) {
+  if (val < 7.5) return GREEN;
+  if (val <= 8.5) return RR_GOLD;
+  return HIGHLIGHT;
+}
+
+// shared dark chart defaults
+Chart.defaults.color = TICK_COLOR;
+Chart.defaults.font.family = "'Rajdhani', sans-serif";
+Chart.defaults.font.size = 12;
+
+function darkScales(opts = {}) {
+  return {
+    x: {
+      grid: { color: GRID_COLOR },
+      ticks: { color: TICK_COLOR, ...opts.xTicks },
+      ...opts.x
+    },
+    y: {
+      grid: { color: GRID_COLOR },
+      ticks: { color: TICK_COLOR, ...opts.yTicks },
+      ...opts.y
+    }
+  };
+}
+
+function darkPlugin() {
+  return {
+    legend: { labels: { color: TICK_COLOR, boxWidth: 14 } },
+    tooltip: {
+      backgroundColor: 'rgba(26,26,46,0.95)',
+      borderColor: RR_PINK,
+      borderWidth: 1,
+      titleColor: RR_GOLD,
+      bodyColor: '#E8E8F0',
+      padding: 10,
+    }
+  };
+}
+
+// =====================================================================
+// OVERVIEW CHARTS
+// =====================================================================
+function buildOverviewCharts() {
+  // Batter overview
+  const bCtx = document.getElementById('chartBatterOverview').getContext('2d');
+  new Chart(bCtx, {
+    type: 'bar',
+    data: {
+      labels: batters.map(b => b.name),
+      datasets: [{
+        label: 'Pressure Performance Index',
+        data: batters.map(b => b.ppi),
+        backgroundColor: batters.map(b => b.inRR ? RR_PINK : RR_BLUE),
+        borderColor: batters.map(b => b.inRR ? RR_PINK : RR_BLUE),
+        borderRadius: 6,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 900, easing: 'easeOutQuart' },
+      plugins: {
+        ...darkPlugin(),
+        tooltip: {
+          ...darkPlugin().tooltip,
+          callbacks: {
+            label: ctx => {
+              const b = batters[ctx.dataIndex];
+              return [`PPI: ${b.ppi}`, `Runs: ${b.runs}`, `Avg: ${b.avg}`, `SR: ${b.sr}`];
+            }
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color: GRID_COLOR }, ticks: { color: TICK_COLOR }, min: 55, max: 100 },
+        y: { grid: { color: GRID_COLOR }, ticks: { color: TICK_COLOR } }
+      }
+    }
+  });
+
+  // Bowler overview
+  const wCtx = document.getElementById('chartBowlerOverview').getContext('2d');
+  new Chart(wCtx, {
+    type: 'bar',
+    data: {
+      labels: bowlers.map(b => b.name),
+      datasets: [{
+        label: 'Bowling Pressure Index',
+        data: bowlers.map(b => b.ppi),
+        backgroundColor: bowlers.map(b => b.inRR ? RR_PINK : RR_BLUE),
+        borderColor: bowlers.map(b => b.inRR ? RR_PINK : RR_BLUE),
+        borderRadius: 6,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 900, easing: 'easeOutQuart' },
+      plugins: {
+        ...darkPlugin(),
+        tooltip: {
+          ...darkPlugin().tooltip,
+          callbacks: {
+            label: ctx => {
+              const b = bowlers[ctx.dataIndex];
+              return [`PPI: ${b.ppi}`, `Wickets: ${b.wickets}`, `Economy: ${b.economy}`, `Death Econ: ${b.deathEcon}`];
+            }
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color: GRID_COLOR }, ticks: { color: TICK_COLOR }, min: 60, max: 73 },
+        y: { grid: { color: GRID_COLOR }, ticks: { color: TICK_COLOR } }
+      }
+    }
+  });
+}
+
+// =====================================================================
+// BATTER TAB
+// =====================================================================
+let batterSortCol = 0, batterSortAsc = true;
+
+function buildBatterTable() {
+  const tbody = document.getElementById('batterTableBody');
+  tbody.innerHTML = '';
+  const sorted = [...batters].sort((a, b) => {
+    const cols = [a.rank, a.name, null, a.ppi, a.runs, a.avg, a.sr, a.deathSR, a.ppSR, a.chaseSR, a.koSR];
+    const colsB= [b.rank, b.name, null, b.ppi, b.runs, b.avg, b.sr, b.deathSR, b.ppSR, b.chaseSR, b.koSR];
+    if (batterSortCol === 1) return batterSortAsc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+    return batterSortAsc ? (cols[batterSortCol] - colsB[batterSortCol]) : (colsB[batterSortCol] - cols[batterSortCol]);
+  });
+  sorted.forEach((b, i) => {
+    const tr = document.createElement('tr');
+    if (b.inRR) tr.classList.add('rr-row');
+    tr.innerHTML = `
+      <td class="rank-cell ${b.rank <= 3 ? 'top3' : ''}">#${b.rank}</td>
+      <td>${b.name}</td>
+      <td class="rr-badge">${b.inRR ? '🏏' : ''}</td>
+      <td class="ppi-cell">${b.ppi}</td>
+      <td>${b.runs.toLocaleString()}</td>
+      <td>${b.avg}</td>
+      <td>${b.sr}</td>
+      <td style="color:${b.deathSR >= 200 ? GREEN : TICK_COLOR}">${b.deathSR}</td>
+      <td>${b.ppSR}</td>
+      <td>${b.chaseSR}</td>
+      <td>${b.koSR}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+let batterPhasesChart, batterRadarChart;
+function buildBatterCharts() {
+  // Phases grouped bar
+  if (batterPhasesChart) batterPhasesChart.destroy();
+  const ctx1 = document.getElementById('chartBatterPhases').getContext('2d');
+  const shortNames = batters.map(b => b.name.split(' ').slice(-1)[0]);
+  batterPhasesChart = new Chart(ctx1, {
+    type: 'bar',
+    data: {
+      labels: shortNames,
+      datasets: [
+        { label: 'Death SR', data: batters.map(b => b.deathSR), backgroundColor: RR_PINK + 'CC', borderRadius: 4 },
+        { label: 'PP SR',    data: batters.map(b => b.ppSR),    backgroundColor: RR_BLUE + 'CC', borderRadius: 4 },
+        { label: 'Chase SR', data: batters.map(b => b.chaseSR), backgroundColor: RR_GOLD + 'CC', borderRadius: 4 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 800 },
+      plugins: { ...darkPlugin() },
+      scales: darkScales({ x: { stacked: false }, y: { stacked: false, min: 90 } })
+    }
+  });
+
+  // Radar top 5
+  if (batterRadarChart) batterRadarChart.destroy();
+  const ctx2 = document.getElementById('chartBatterRadar').getContext('2d');
+  const radarColors = [RR_PINK, RR_BLUE, RR_GOLD, GREEN, HIGHLIGHT];
+  const top5 = batters.slice(0, 5);
+  batterRadarChart = new Chart(ctx2, {
+    type: 'radar',
+    data: {
+      labels: ['Overall SR', 'Death SR', 'PP SR', 'Chase SR', 'KO SR'],
+      datasets: top5.map((b, i) => ({
+        label: b.name.split(' ').slice(-1)[0],
+        data: [b.sr, b.deathSR, b.ppSR, b.chaseSR, b.koSR],
+        borderColor: radarColors[i],
+        backgroundColor: radarColors[i] + '22',
+        pointBackgroundColor: radarColors[i],
+        borderWidth: 2,
+        pointRadius: 4,
+      }))
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 800 },
+      plugins: { ...darkPlugin() },
+      scales: {
+        r: {
+          grid: { color: GRID_COLOR },
+          angleLines: { color: GRID_COLOR },
+          ticks: { color: TICK_COLOR, backdropColor: 'transparent', stepSize: 50 },
+          pointLabels: { color: TICK_COLOR, font: { size: 12 } },
+          min: 80, max: 300
+        }
+      }
+    }
+  });
+}
+
+// =====================================================================
+// BOWLER TAB
+// =====================================================================
+let bowlerEconChart, bowlerScatterChart;
+
+function buildBowlerTable() {
+  const tbody = document.getElementById('bowlerTableBody');
+  tbody.innerHTML = '';
+  bowlers.forEach(b => {
+    const tr = document.createElement('tr');
+    if (b.inRR) tr.classList.add('rr-row');
+    tr.innerHTML = `
+      <td class="rank-cell ${b.rank <= 3 ? 'top3' : ''}">#${b.rank}</td>
+      <td>${b.name}</td>
+      <td class="ppi-cell">${b.ppi}</td>
+      <td>${b.wickets}</td>
+      <td class="${b.economy < 7.5 ? 'econ-green' : b.economy <= 8.5 ? 'econ-yellow' : 'econ-red'}">${b.economy}</td>
+      <td>${b.avg}</td>
+      <td class="${b.deathEcon < 7.5 ? 'econ-green' : b.deathEcon <= 8.5 ? 'econ-yellow' : 'econ-red'}">${b.deathEcon}</td>
+      <td class="${b.ppEcon < 7.5 ? 'econ-green' : b.ppEcon <= 8.5 ? 'econ-yellow' : 'econ-red'}">${b.ppEcon}</td>
+      <td>${b.deathWkts}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function buildBowlerCharts() {
+  if (bowlerEconChart) bowlerEconChart.destroy();
+  const ctx1 = document.getElementById('chartBowlerEcon').getContext('2d');
+  const shortNames = bowlers.map(b => b.name.split(' ').slice(-1)[0]);
+  bowlerEconChart = new Chart(ctx1, {
+    type: 'bar',
+    data: {
+      labels: shortNames,
+      datasets: [
+        { label: 'Death Economy', data: bowlers.map(b => b.deathEcon), backgroundColor: HIGHLIGHT + 'CC', borderRadius: 4 },
+        { label: 'PP Economy',    data: bowlers.map(b => b.ppEcon),    backgroundColor: RR_BLUE + 'CC',  borderRadius: 4 },
+        { label: 'Overall Econ', data: bowlers.map(b => b.economy),   backgroundColor: RR_GOLD + 'CC',  borderRadius: 4 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 800 },
+      plugins: {
+        ...darkPlugin(),
+        tooltip: {
+          ...darkPlugin().tooltip,
+          callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.raw} (lower is better)` }
+        }
+      },
+      scales: darkScales({ y: { min: 3, max: 10 } })
+    }
+  });
+
+  if (bowlerScatterChart) bowlerScatterChart.destroy();
+  const ctx2 = document.getElementById('chartBowlerScatter').getContext('2d');
+  bowlerScatterChart = new Chart(ctx2, {
+    type: 'scatter',
+    data: {
+      datasets: [{
+        label: 'Bowlers',
+        data: bowlers.map(b => ({ x: b.economy, y: b.ppi, name: b.name })),
+        backgroundColor: bowlers.map(b => b.inRR ? RR_PINK : RR_BLUE),
+        pointRadius: 10,
+        pointHoverRadius: 13,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 800 },
+      plugins: {
+        ...darkPlugin(),
+        tooltip: {
+          ...darkPlugin().tooltip,
+          callbacks: {
+            label: ctx => {
+              const b = bowlers[ctx.dataIndex];
+              return [`${b.name}`, `Economy: ${b.economy}`, `PPI: ${b.ppi}`];
+            }
+          }
+        }
+      },
+      scales: {
+        x: { title: { display: true, text: 'Overall Economy (lower = better)', color: TICK_COLOR }, grid: { color: GRID_COLOR }, ticks: { color: TICK_COLOR } },
+        y: { title: { display: true, text: 'Bowling Pressure Index (PPI)', color: TICK_COLOR }, grid: { color: GRID_COLOR }, ticks: { color: TICK_COLOR } }
+      }
+    }
+  });
+}
+
+// =====================================================================
+// ALL-ROUNDERS TAB
+// =====================================================================
+let arBubbleChart;
+
+function buildARTable() {
+  const tbody = document.getElementById('arTableBody');
+  tbody.innerHTML = '';
+  allrounders.forEach(a => {
+    const role = a.batPPI > a.bowlPPI ? '🏏 Bat-dom' : a.bowlPPI > a.batPPI + 10 ? '⚡ Bowl-dom' : '⭐ Balanced';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="rank-cell ${a.rank <= 3 ? 'top3' : ''}">#${a.rank}</td>
+      <td>${a.name}</td>
+      <td class="ppi-cell">${a.arIndex}</td>
+      <td style="color:${RR_PINK}">${a.batPPI}</td>
+      <td style="color:${GREEN}">${a.bowlPPI}</td>
+      <td>${a.batSR}</td>
+      <td class="${a.economy < 7.5 ? 'econ-green' : a.economy <= 8.5 ? 'econ-yellow' : 'econ-red'}">${a.economy}</td>
+      <td style="font-size:12px">${role}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function buildARCharts() {
+  if (arBubbleChart) arBubbleChart.destroy();
+  const ctx = document.getElementById('chartARBubble').getContext('2d');
+
+  const colors = [RR_PINK, RR_BLUE, RR_GOLD, GREEN, HIGHLIGHT, '#9B59B6', '#3498DB', '#E67E22', '#1ABC9C', '#E74C3C'];
+
+  arBubbleChart = new Chart(ctx, {
+    type: 'bubble',
+    data: {
+      datasets: allrounders.map((a, i) => ({
+        label: a.name,
+        data: [{ x: a.batPPI, y: a.bowlPPI, r: Math.max(a.arIndex / 3.5, 10) }],
+        backgroundColor: colors[i] + '99',
+        borderColor: colors[i],
+        borderWidth: 2,
+      }))
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 900 },
+      plugins: {
+        ...darkPlugin(),
+        legend: { display: false },
+        tooltip: {
+          ...darkPlugin().tooltip,
+          callbacks: {
+            label: ctx => {
+              const a = allrounders[ctx.datasetIndex];
+              return [`${a.name}`, `AR Index: ${a.arIndex}`, `Bat PPI: ${a.batPPI}`, `Bowl PPI: ${a.bowlPPI}`];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'Batting PPI', color: TICK_COLOR },
+          grid: { color: GRID_COLOR }, ticks: { color: TICK_COLOR },
+          min: 30, max: 70
+        },
+        y: {
+          title: { display: true, text: 'Bowling PPI', color: TICK_COLOR },
+          grid: { color: GRID_COLOR }, ticks: { color: TICK_COLOR },
+          min: 30, max: 72
+        }
+      }
+    },
+    plugins: [{
+      id: 'diagonalLine',
+      afterDraw(chart) {
+        const { ctx: c, chartArea: { left, right, top, bottom }, scales: { x, y } } = chart;
+        const minV = 30, maxV = 70;
+        const x1 = x.getPixelForValue(minV), y1 = y.getPixelForValue(minV);
+        const x2 = x.getPixelForValue(maxV), y2 = y.getPixelForValue(maxV);
+        c.save();
+        c.setLineDash([6, 4]);
+        c.strokeStyle = 'rgba(255,255,255,0.2)';
+        c.lineWidth = 1.5;
+        c.beginPath();
+        c.moveTo(x1, y1);
+        c.lineTo(x2, y2);
+        c.stroke();
+        c.restore();
+      }
+    }, {
+      id: 'bubbleLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx: c } = chart;
+        chart.data.datasets.forEach((ds, i) => {
+          const meta = chart.getDatasetMeta(i);
+          if (!meta.hidden && meta.data[0]) {
+            const pt = meta.data[0];
+            c.save();
+            c.fillStyle = '#E8E8F0';
+            c.font = "bold 11px 'Rajdhani', sans-serif";
+            c.textAlign = 'center';
+            c.textBaseline = 'middle';
+            const lbl = allrounders[i].name.split(' ').slice(-1)[0];
+            c.fillText(lbl, pt.x, pt.y);
+            c.restore();
+          }
+        });
+      }
+    }]
+  });
+}
+
+// =====================================================================
+// RR SQUAD TAB
+// =====================================================================
+let rrBatComp, rrBowlGap, rrBatUnit, rrBowlUnit;
+
+function buildRRCharts() {
+  if (rrBatComp) rrBatComp.destroy();
+  if (rrBowlGap) rrBowlGap.destroy();
+  if (rrBatUnit) rrBatUnit.destroy();
+  if (rrBowlUnit) rrBowlUnit.destroy();
+
+  // RR Bat PPI vs Global
+  const ctx1 = document.getElementById('chartRRBatComp').getContext('2d');
+  const globalBatPPI = batters.map(b => b.ppi);
+  const rrBatPPIs = rrBatters.map(b => b.ppi);
+  rrBatComp = new Chart(ctx1, {
+    type: 'bar',
+    data: {
+      labels: ['P1','P2','P3','P4','P5','P6','P7','P8','P9','P10'],
+      datasets: [
+        { label: 'Global Top 10 PPI', data: globalBatPPI, backgroundColor: RR_BLUE + 'AA', borderRadius: 4 },
+        { label: 'RR Squad PPI',      data: rrBatPPIs.slice(0, 10), backgroundColor: RR_PINK + 'AA', borderRadius: 4 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 800 },
+      plugins: {
+        ...darkPlugin(),
+        tooltip: {
+          ...darkPlugin().tooltip,
+          callbacks: {
+            title: ctx => ctx[0].datasetIndex === 0 ? batters[ctx[0].dataIndex]?.name : rrBatters[ctx[0].dataIndex]?.name,
+          }
+        }
+      },
+      scales: darkScales({ y: { min: 20 } })
+    }
+  });
+
+  // RR Bowling Death Economy gap
+  const ctx2 = document.getElementById('chartRRBowlGap').getContext('2d');
+  const globalDeathEcon = bowlers.map(b => b.deathEcon);
+  const rrDeathEcon = rrBowlers.map(b => b.deathEcon);
+  rrBowlGap = new Chart(ctx2, {
+    type: 'bar',
+    data: {
+      labels: ['P1','P2','P3','P4','P5','P6','P7','P8','P9'],
+      datasets: [
+        { label: 'Global Elite Death Econ', data: globalDeathEcon.slice(0,9), backgroundColor: GREEN + 'AA', borderRadius: 4 },
+        { label: 'RR Squad Death Econ',     data: rrDeathEcon, backgroundColor: HIGHLIGHT + 'AA', borderRadius: 4 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 800 },
+      plugins: {
+        ...darkPlugin(),
+        tooltip: {
+          ...darkPlugin().tooltip,
+          callbacks: {
+            label: ctx => `${ctx.dataset.label}: ${ctx.raw} (lower = better)`,
+            title: ctx => ctx[0].datasetIndex === 1 ? rrBowlers[ctx[0].dataIndex]?.name : bowlers[ctx[0].dataIndex]?.name,
+          }
+        }
+      },
+      scales: darkScales({ y: { min: 3, max: 12 } })
+    }
+  });
+
+  // RR Bat unit
+  const ctx3 = document.getElementById('chartRRBatUnit').getContext('2d');
+  rrBatUnit = new Chart(ctx3, {
+    type: 'bar',
+    data: {
+      labels: rrBatters.map(b => b.name.split(' ').slice(-1)[0]),
+      datasets: [
+        { label: 'PPI',      data: rrBatters.map(b => b.ppi),    backgroundColor: RR_PINK + 'BB', borderRadius: 4 },
+        { label: 'Death SR', data: rrBatters.map(b => b.deathSR), backgroundColor: RR_GOLD + 'BB', borderRadius: 4 },
+        { label: 'PP SR',    data: rrBatters.map(b => b.ppSR),   backgroundColor: RR_BLUE + 'BB', borderRadius: 4 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 800 },
+      plugins: { ...darkPlugin() },
+      scales: darkScales({ y: { min: 0 } })
+    }
+  });
+
+  // RR Bowl unit
+  const ctx4 = document.getElementById('chartRRBowlUnit').getContext('2d');
+  rrBowlUnit = new Chart(ctx4, {
+    type: 'bar',
+    data: {
+      labels: rrBowlers.map(b => b.name.split(' ').slice(-1)[0]),
+      datasets: [
+        { label: 'PPI',          data: rrBowlers.map(b => b.ppi),       backgroundColor: RR_PINK + 'BB', borderRadius: 4 },
+        { label: 'Death Economy',data: rrBowlers.map(b => b.deathEcon), backgroundColor: HIGHLIGHT + 'BB', borderRadius: 4 },
+        { label: 'PP Economy',   data: rrBowlers.map(b => b.ppEcon),   backgroundColor: GREEN + 'BB', borderRadius: 4 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 800 },
+      plugins: { ...darkPlugin() },
+      scales: darkScales({ y: { min: 0 } })
+    }
+  });
+}
+
+// =====================================================================
+// TABLE SORTING
+// =====================================================================
+const tableSortState = {};
+
+function sortTable(tableId, colIndex, numeric) {
+  if (!tableSortState[tableId]) tableSortState[tableId] = { col: colIndex, asc: true };
+  const state = tableSortState[tableId];
+  if (state.col === colIndex) state.asc = !state.asc;
+  else { state.col = colIndex; state.asc = true; }
+
+  const table = document.getElementById(tableId);
+  const headers = table.querySelectorAll('thead th');
+  headers.forEach((h, i) => {
+    h.classList.toggle('sorted', i === colIndex);
+    const arrow = h.querySelector('.sort-arrow');
+    if (arrow && i === colIndex) arrow.textContent = state.asc ? '↑' : '↓';
+    else if (arrow) arrow.textContent = '↕';
+  });
+
+  const tbody = table.querySelector('tbody');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  rows.sort((a, b) => {
+    const aVal = a.cells[colIndex]?.textContent.trim() || '';
+    const bVal = b.cells[colIndex]?.textContent.trim() || '';
+    if (numeric) {
+      const aNum = parseFloat(aVal.replace(/[^0-9.-]/g, '')) || 0;
+      const bNum = parseFloat(bVal.replace(/[^0-9.-]/g, '')) || 0;
+      return state.asc ? aNum - bNum : bNum - aNum;
+    }
+    return state.asc ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+  });
+  rows.forEach(r => tbody.appendChild(r));
+}
+
+// =====================================================================
+// TAB SWITCHING
+// =====================================================================
+const tabBuilt = {};
+
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+
+  if (!tabBuilt[id]) {
+    tabBuilt[id] = true;
+    if (id === 'batters')     { buildBatterTable(); buildBatterCharts(); }
+    if (id === 'bowlers')     { buildBowlerTable(); buildBowlerCharts(); }
+    if (id === 'allrounders') { buildARTable(); buildARCharts(); }
+    if (id === 'rrsquad')     { buildRRCharts(); }
+  }
+}
+
+// =====================================================================
+// INIT
+// =====================================================================
+document.addEventListener('DOMContentLoaded', () => {
+  buildOverviewCharts();
+  buildBatterTable();
+  buildBowlerTable();
+  buildARTable();
+  tabBuilt['overview'] = true;
+});
+</script>
+</body>
+</html>
