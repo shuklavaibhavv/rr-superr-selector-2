@@ -33,7 +33,8 @@ from reportlab.lib.units import mm, cm
 BASE_DIR = '/Users/vaibhavshukla/Desktop/RR Competition'
 CHART_DIR = os.path.join(BASE_DIR, 'charts_v2')
 os.makedirs(CHART_DIR, exist_ok=True)
-PDF_OUT = os.path.join(BASE_DIR, 'RR_AuctionStrategy_Rigorous.pdf')
+PDF_OUT = os.path.join(BASE_DIR, 'RR_AuctionStrategy_Rigorous_1.pdf')
+PDF_OUT_LEGACY = os.path.join(BASE_DIR, 'RR_AuctionStrategy_Rigorous.pdf')
 BUNDLE_RES = '/tmp/repro_bundle/results'
 PIPELINE_DIR = '/tmp/run_pipeline'
 
@@ -81,7 +82,7 @@ S_SEC_H  = sty('SH', fontName='Helvetica-Bold', fontSize=12, textColor=C_NAVY, s
 S_SUB_H  = sty('SB', fontName='Helvetica-Bold', fontSize=9.5, textColor=C_PINK, spaceBefore=3, spaceAfter=2)
 S_BODY   = sty('B',  fontName='Helvetica', fontSize=8.0, leading=11.2, textColor=C_BLACK, spaceAfter=2.5, alignment=TA_JUSTIFY)
 S_BULLET = sty('BL', fontName='Helvetica', fontSize=7.8, leading=10.5, textColor=C_BLACK, leftIndent=8, spaceAfter=1.5)
-S_ROLE   = sty('RL', fontName='Helvetica', fontSize=7.2, leading=9.6, textColor=C_BLACK, leftIndent=6, spaceAfter=1.0)
+S_ROLE   = sty('RL', fontName='Helvetica', fontSize=6.8, leading=8.6, textColor=C_BLACK, leftIndent=6, spaceAfter=0.6)
 S_NOTE   = sty('N',  fontName='Helvetica-Oblique', fontSize=7.5, leading=10.0, textColor=C_GREY, leftIndent=6, spaceAfter=2)
 S_CODE   = sty('C',  fontName='Helvetica-Bold', fontSize=8.2, textColor=C_NAVY, spaceAfter=2.5, leftIndent=8)
 
@@ -170,7 +171,7 @@ fig.tight_layout()
 chart_f2 = save_fig(fig, 'fig2_bow_ensemble.png')
 
 # Fig 3 & 4: Validation
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 3.5))
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 3.6))
 cats = ['Inn 1 Ord', 'Inn 1 Press', 'Inn 2 Ord', 'Inn 2 Press']
 rpo = lp['rpo'].tolist()
 dot = lp['dot'].tolist()
@@ -183,8 +184,9 @@ ax1.bar(x - 0.5*w, dot, w, label='Dot %', color=RR_GREY, alpha=0.7)
 ax1.bar(x + 0.5*w, li_v, w, label='Mean LI', color=RR_GOLD, alpha=0.9)
 ax1.bar(x + 1.5*w, wk, w, label='Wkts/100b', color=RR_PINK, alpha=0.9)
 ax1.set_xticks(x); ax1.set_xticklabels(cats, fontsize=8)
-ax1.set_title('Figure 3: League-Wide Metrics by Situation', fontsize=9, fontweight='bold')
-ax1.legend(fontsize=7, loc='upper right'); ax1.grid(axis='y', alpha=0.3)
+ax1.set_title('Figure 3: League-Wide Metrics by Situation', fontsize=9, fontweight='bold', pad=22)
+ax1.legend(bbox_to_anchor=(0.5, 1.05), loc='center', ncol=4, fontsize=7.2, frameon=True, facecolor='white', edgecolor='#cccccc')
+ax1.grid(axis='y', alpha=0.3)
 ax1.spines['top'].set_visible(False); ax1.spines['right'].set_visible(False)
 
 n_bars = lp['n'].tolist()
@@ -195,8 +197,9 @@ for i, (liv, nb) in enumerate(zip(li_v, n_bars)):
 ax2.axhline(1.5, color='red', lw=1.2, ls='--', label='Pressure Threshold (LI ≥ 1.5)')
 ax2.set_xticks(np.arange(4)); ax2.set_xticklabels(cats, fontsize=8)
 ax2.set_ylabel('Mean Leverage Index', fontsize=8)
-ax2.set_title('Figure 4: Mean Leverage Index: Ordinary vs Pressure', fontsize=9, fontweight='bold')
-ax2.legend(fontsize=7); ax2.grid(axis='y', alpha=0.3)
+ax2.set_title('Figure 4: Mean Leverage Index: Ordinary vs Pressure', fontsize=9, fontweight='bold', pad=22)
+ax2.legend(bbox_to_anchor=(0.5, 1.05), loc='center', fontsize=7.2, frameon=True, facecolor='white', edgecolor='#cccccc')
+ax2.grid(axis='y', alpha=0.3)
 ax2.spines['top'].set_visible(False); ax2.spines['right'].set_visible(False)
 fig.tight_layout()
 chart_f3_4 = save_fig(fig, 'fig3_4_validation.png')
@@ -207,48 +210,52 @@ p_sr  = trad_bat.reindex(names_b)['p_sr'].tolist()
 q_sr  = trad_bat.reindex(names_b)['q_sr'].tolist()
 p_bnd = trad_bat.reindex(names_b)['p_bnd'].tolist()
 q_bnd = trad_bat.reindex(names_b)['q_bnd'].tolist()
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 3.8))
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4.0))
 y = np.arange(10); w = 0.35
 ax1.barh(y - w/2, p_sr, w, label='Pressure SR', color=RR_PINK, alpha=0.9)
 ax1.barh(y + w/2, q_sr, w, label='Ordinary SR', color=RR_NAVY, alpha=0.6)
 ax1.set_yticks(y); ax1.set_yticklabels([f'#{i+1} {n}' for i, n in enumerate(names_b)], fontsize=8)
 ax1.invert_yaxis(); ax1.set_xlabel('Strike Rate', fontsize=8)
-ax1.set_title('Figure 5a: Batter Strike Rate (Pressure vs Ordinary)', fontsize=9, fontweight='bold')
-ax1.legend(fontsize=7.5, loc='lower right'); ax1.grid(axis='x', alpha=0.3)
+ax1.set_title('Figure 5a: Batter Strike Rate (Pressure vs Ordinary)', fontsize=9, fontweight='bold', pad=22)
+ax1.legend(bbox_to_anchor=(0.5, 1.05), loc='center', ncol=2, fontsize=7.5, frameon=True, facecolor='white', edgecolor='#cccccc')
+ax1.grid(axis='x', alpha=0.3)
 ax1.spines['top'].set_visible(False); ax1.spines['right'].set_visible(False)
 
 ax2.barh(y - w/2, p_bnd, w, label='Pressure Boundary%', color=RR_PINK, alpha=0.9)
 ax2.barh(y + w/2, q_bnd, w, label='Ordinary Boundary%', color=RR_NAVY, alpha=0.6)
 ax2.set_yticks(y); ax2.set_yticklabels([f'#{i+1} {n}' for i, n in enumerate(names_b)], fontsize=8)
 ax2.invert_yaxis(); ax2.set_xlabel('Boundary % (runs ≥ 4)', fontsize=8)
-ax2.set_title('Figure 5b: Batter Boundary % (Pressure vs Ordinary)', fontsize=9, fontweight='bold')
-ax2.legend(fontsize=7.5, loc='lower right'); ax2.grid(axis='x', alpha=0.3)
+ax2.set_title('Figure 5b: Batter Boundary % (Pressure vs Ordinary)', fontsize=9, fontweight='bold', pad=22)
+ax2.legend(bbox_to_anchor=(0.5, 1.05), loc='center', ncol=2, fontsize=7.5, frameon=True, facecolor='white', edgecolor='#cccccc')
+ax2.grid(axis='x', alpha=0.3)
 ax2.spines['top'].set_visible(False); ax2.spines['right'].set_visible(False)
 fig.tight_layout()
 chart_f5 = save_fig(fig, 'fig5_trad_bat.png')
 
-# Fig 6: Trad Bowlers (legend in lower right off Varun Chakravarthy)
+# Fig 6: Trad Bowlers (legend outside plot area)
 names_w = bowl10.name.tolist()
 p_sr_w  = trad_bowl.reindex(names_w)['p_sr'].tolist()
 q_sr_w  = trad_bowl.reindex(names_w)['q_sr'].tolist()
 p_dot_w = trad_bowl.reindex(names_w)['p_dot'].tolist()
 q_dot_w = trad_bowl.reindex(names_w)['q_dot'].tolist()
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 3.8))
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4.0))
 y = np.arange(10); w = 0.35
 ax1.barh(y - w/2, p_sr_w, w, label='Pressure Economy', color=RR_PINK, alpha=0.9)
 ax1.barh(y + w/2, q_sr_w, w, label='Ordinary Economy', color=RR_NAVY, alpha=0.6)
 ax1.set_yticks(y); ax1.set_yticklabels([f'#{i+1} {n}' for i, n in enumerate(names_w)], fontsize=8)
 ax1.invert_yaxis(); ax1.set_xlabel('Economy (Runs Conceded per Over)', fontsize=8)
-ax1.set_title('Figure 6a: Bowler Economy (Pressure vs Ordinary)', fontsize=9, fontweight='bold')
-ax1.legend(fontsize=7.5, loc='lower right'); ax1.grid(axis='x', alpha=0.3)
+ax1.set_title('Figure 6a: Bowler Economy (Pressure vs Ordinary)', fontsize=9, fontweight='bold', pad=22)
+ax1.legend(bbox_to_anchor=(0.5, 1.05), loc='center', ncol=2, fontsize=7.5, frameon=True, facecolor='white', edgecolor='#cccccc')
+ax1.grid(axis='x', alpha=0.3)
 ax1.spines['top'].set_visible(False); ax1.spines['right'].set_visible(False)
 
 ax2.barh(y - w/2, p_dot_w, w, label='Pressure Dot%', color=RR_PINK, alpha=0.9)
 ax2.barh(y + w/2, q_dot_w, w, label='Ordinary Dot%', color=RR_NAVY, alpha=0.6)
 ax2.set_yticks(y); ax2.set_yticklabels([f'#{i+1} {n}' for i, n in enumerate(names_w)], fontsize=8)
 ax2.invert_yaxis(); ax2.set_xlabel('Dot Ball %', fontsize=8)
-ax2.set_title('Figure 6b: Bowler Dot Ball % (Pressure vs Ordinary)', fontsize=9, fontweight='bold')
-ax2.legend(fontsize=7.5, loc='lower right'); ax2.grid(axis='x', alpha=0.3)
+ax2.set_title('Figure 6b: Bowler Dot Ball % (Pressure vs Ordinary)', fontsize=9, fontweight='bold', pad=22)
+ax2.legend(bbox_to_anchor=(0.5, 1.05), loc='center', ncol=2, fontsize=7.5, frameon=True, facecolor='white', edgecolor='#cccccc')
+ax2.grid(axis='x', alpha=0.3)
 ax2.spines['top'].set_visible(False); ax2.spines['right'].set_visible(False)
 fig.tight_layout()
 chart_f6 = save_fig(fig, 'fig6_trad_bow.png')
@@ -324,7 +331,7 @@ story.append(sp(4))
 
 story.append(Paragraph("Core Analytical Deliverables", S_SUB_H))
 core_bullets = [
-    "<b>Objective Win-Probability Leverage</b>: Replaces rule-based definitions with game-state sensitivity (LI ≥ 1.5, win probability 0.15–0.85, ≥ 18 legal balls bowled).",
+    "<b>Objective Win-Probability Leverage</b>: Game-state sensitivity (LI ≥ 1.5, win probability 0.15–0.85, ≥ 18 legal balls bowled).",
     "<b>Per-Ball Value Over Expectation</b>: Run and dismissal components evaluated against out-of-fold match-state baselines, with run cost of wickets derived from expected runs remaining.",
     "<b>Empirical-Bayes Shrinkage</b>: Regresses pressure form onto player baseline to prevent small-sample noise from driving selection.",
     "<b>Dual Ensemble Robustness</b>: Weighted 50% across 9 sensitivity specifications and 50% across 100 match-level bootstrap replications.",
@@ -405,7 +412,8 @@ story.append(t_bowl)
 story.append(sp(1.5))
 story.append(Paragraph(
     "<i>Note: PPI/BPI raw denotes volume-weighted value over expectation per 100 balls. PPI/BPI post denotes empirical-Bayes posterior mean. "
-    "Baseline is ordinary-situation shrunk form. Consistency is the proportion of qualifying pressure appearances with positive net contribution.</i>",
+    "Baseline is ordinary-situation shrunk form. Consistency is the proportion of qualifying pressure appearances with positive net contribution.<br/>"
+    "<b>Footnote</b>: Table 1b counts all deliveries bowled under pressure (including wides and no-balls); Table 6b counts legal balls only.</i>",
     S_NOTE
 ))
 story.append(PageBreak())
@@ -416,7 +424,7 @@ story.append(Image(chart_f1, width=INNER_W, height=INNER_W * 2.7 / 10.5))
 story.append(sp(1.5))
 story.append(p(
     "<b>Batter Robustness Interpretation</b>: Tim David (rank 1), Shreyas Iyer (rank 2), Jos Buttler (rank 3), and Heinrich Klaasen (rank 4) "
-    "demonstrate exceptional robustness, appearing in the top 10 in at least 8 of the 9 specifications and over 69% of bootstrap draws. "
+    "demonstrate exceptional robustness, appearing in the top 10 in at least 8 of the 9 specifications and at least 69% of bootstrap draws. "
     "In contrast, Cameron Green (rank 9) and Rinku Singh (rank 10) are present in only 1 of the 9 specification tests, indicating their "
     "top-10 ranking is sensitive to specific model parameters.",
     S_BODY
@@ -455,7 +463,7 @@ story.append(Paragraph("Competition Quality Weighting Matrix", S_SUB_H))
 story.append(p(
     "To ensure fair evaluation across varying tiers of competition, each ball is weighted by tournament strength: "
     "<b>IPL deliveries receive a weight of 1.0</b>; <b>T20Is between two ICC Full Members receive 0.8</b>; and <b>T20Is involving Associate members or Emerging events receive 0.4</b>. "
-    "<i>[assumption — not from data]</i>: These numerical weights reflect standard analytical hierarchy. The robustness of this assumption is explicitly tested in Specification 5 ('equalw').",
+    "<i>[assumption — not from data]</i>: These numerical weights reflect analyst judgement. The robustness of this assumption is explicitly tested in Specification 5 ('equalw').",
     S_BODY
 ))
 
@@ -524,7 +532,7 @@ story.append(PageBreak())
 # ── PAGE 6: SECTION 3 (cont) – LEAGUE VALIDATION ────────────────────────────
 story.extend(sec_header("3. Pressure Validation (continued)", "Table 3 & Figures 3–4: Empirical Validation Across 186,814 Legal Deliveries"))
 story.append(p(
-    "Table 3 proves that deliveries passing the 3-gate pressure definition exhibit fundamentally distinct behavioral characteristics from ordinary deliveries.",
+    "Table 3 validates that deliveries passing the 3-gate pressure definition exhibit fundamentally distinct behavioral characteristics from ordinary deliveries.",
     S_BODY
 ))
 
@@ -554,9 +562,8 @@ story.append(sp(2.5))
 story.append(Image(chart_f3_4, width=INNER_W, height=INNER_W * 3.5 / 11.0))
 story.append(sp(1.5))
 story.append(p(
-    "<b>Validation Findings</b>: In both innings, pressure deliveries exhibit <b>2.9× to 4.0× higher Leverage Index</b> than ordinary deliveries (2.11 vs 0.73 in Inn 1; 2.96 vs 0.75 in Inn 2). "
-    "Wicket rates increase significantly under pressure (6.11 to 6.26 wickets per 100 balls vs 5.43 to 5.57 ordinarily), while dot-ball percentages decrease as batters attack. "
-    "Mean win probability remains perfectly balanced near 0.48–0.50, proving the live-contest gate effectively eliminates asymmetric garbage-time deliveries.",
+    "<b>Validation Findings</b>: Pressure balls have 2.9× (innings 1) and 4.0× (innings 2) the mean leverage; "
+    "wicket rates are about 12% higher; dot-ball rates 3–4 points lower; mean win probability stays between 0.47 and 0.50.",
     S_BODY
 ))
 story.append(PageBreak())
@@ -601,6 +608,7 @@ story.append(PageBreak())
 
 # ── PAGE 8: SECTION 4 (cont) – RELIABILITY ANALYSIS ─────────────────────────
 story.extend(sec_header("4. Performance Measurement (continued)", "Table 4: Split-Half Reliability Testing Across 40 Random Match Partitions"))
+story.append(Paragraph("4.3 Split-Half Reliability Testing Across Partitions", S_SUB_H))
 story.append(p(
     "To rigorously test whether pressure performance reflects genuine persistent skill or random variance, we conducted <b>40 independent split-half reliability trials</b>. "
     "In each trial, the 818 matches were randomly divided into two equal halves (Half A and Half B). For players with ≥ 20 balls in each half, we correlated pressure performance in A with pressure performance in B, "
@@ -641,7 +649,7 @@ story.append(p(
 ))
 
 story.append(sp(2))
-story.append(Paragraph("4.3 Composite Specification Score", S_SUB_H))
+story.append(Paragraph("4.4 Composite Specification Score", S_SUB_H))
 story.append(Paragraph(
     "<b>Composite Score = 0.70 × z(Shrunk Pressure Value) + 0.15 × z(Consistency) + 0.15 × z(Delta)</b>",
     S_CODE
@@ -675,9 +683,8 @@ story.append(sp(3))
 
 story.append(Paragraph("Impact of the IPL 2026 Activity Filter", S_SUB_H))
 story.append(p(
-    "The IPL 2026 activity filter excludes players with no active IPL 2026 participation. This objectively removes retired players "
-    "(for example, <b>Dinesh Karthik</b>, <b>Andre Russell</b>, and <b>Ravichandran Ashwin</b> ranked in the top 10 prior to this filter and were eliminated by it) "
-    "as well as T20I-only players who do not participate in the IPL auction pool. "
+    "The IPL 2026 activity filter excludes players with no IPL 2026 record in the supplied data (for example Dinesh Karthik, Andre Russell and Ravichandran Ashwin, who ranked in the top 10 before this filter) "
+    "as well as T20I-only players. "
     "<i>[assumption — not from data]</i>: Nationality rules, overseas slot caps, physical fitness, franchise retentions, and RTM rights remain outside the scope of the CSVs.",
     S_BODY
 ))
@@ -686,7 +693,7 @@ story.append(sp(2.5))
 story.append(Paragraph("Metrics Explicitly Excluded from Score Inputs", S_SUB_H))
 items_excluded = [
     "<b>Cumulative Volume Totals (Total Runs, Total Wickets)</b>: Heavily biased toward top-order batters and full-quota bowlers regardless of situational efficiency.",
-    "<b>Knockout-Only Splits</b>: Severely underpowered sample sizes (often < 20 balls per player) that yield unacceptably high standard errors.",
+    "<b>Knockout-Only Splits</b>: Severely underpowered sample sizes that yield unacceptably high standard errors across short tournament playoff structures.",
     "<b>Unadjusted Batting / Bowling Averages</b>: Highly distorted by not-outs and fail to penalise slow run-rates in high-leverage chases."
 ]
 for ie in items_excluded:
@@ -723,7 +730,8 @@ story.append(p(
     "We perform 100 bootstrap resamples at the <b>match level</b> (sampling full matches with replacement and re-indexing duplicate matches to prevent innings cross-contamination). "
     "Final ensemble score = 0.50 × Specification-Mean Score + 0.50 × Bootstrap-Mean Score.<br/><br/>"
     "<b>High-Confidence vs Lower-Confidence Classifications:</b><br/>"
-    "• <b>High Confidence</b>: Players appearing in at least 8 of 9 specifications and > 65% of bootstraps (Batters: <b>Tim David</b>, <b>Shreyas Iyer</b>, <b>Jos Buttler</b>, <b>Heinrich Klaasen</b>; Bowlers: <b>Sunil Narine</b>, <b>Rashid Khan</b>).<br/>"
+    "• <b>High Confidence</b>: Defined as appearing in ≥ 8 of 9 specifications AND ≥ 65% of bootstrap iterations. Evaluated from <code>final_*_filtered.csv</code>, only four batters qualify: <b>Tim David</b> (9/9 specs, 85% boot), <b>Shreyas Iyer</b> (9/9 specs, 96% boot), <b>Jos Buttler</b> (8/9 specs, 95% boot), and <b>Heinrich Klaasen</b> (9/9 specs, 69% boot). <b>No bowler qualifies under this joint criterion</b>.<br/>"
+    "• <b>Bowler Robustness Trade-offs</b>: Sunil Narine and Rashid Khan are strongest on specifications (8/9) but only 62% and 57% on bootstraps; Varun Chakravarthy has the highest bootstrap rate (93%) but only 6/9 specs.<br/>"
     "• <b>Lower Confidence</b>: Players qualifying on composite score but appearing in only 1 of 9 specifications (Batters: <b>Cameron Green</b> [1/9], <b>Rinku Singh</b> [1/9]; Bowler: <b>Yuzvendra Chahal</b> [1/9]). Their rankings are sensitive to parameter tuning.",
     S_BODY
 ))
@@ -799,8 +807,13 @@ for _, r in bowl10.iterrows():
 t_w_trad = Table(bowl_trad_rows, colWidths=[0.8*cm, 3.4*cm, 1.8*cm, 1.8*cm, 2.5*cm, 1.8*cm, 1.5*cm, 2.0*cm, 1.8*cm, 2.5*cm, 1.8*cm, 1.5*cm])
 t_w_trad.setStyle(TableStyle(tbl_style_base()))
 story.append(t_w_trad)
-story.append(sp(2))
-story.append(Image(chart_f6, width=INNER_W, height=INNER_W * 3.8 / 11.0))
+story.append(sp(1))
+story.append(Paragraph(
+    "<i>Footnote: Table 1b counts all deliveries bowled under pressure (including wides and no-balls); Table 6b counts legal balls only.</i>",
+    S_NOTE
+))
+story.append(sp(1))
+story.append(Image(chart_f6, width=INNER_W, height=INNER_W * 3.7 / 11.0))
 story.append(PageBreak())
 
 # ── PAGE 13: SECTION 6 (cont) – SCATTER CHARTS ──────────────────────────────
@@ -826,9 +839,9 @@ story.append(scatter_tbl)
 story.append(sp(1.5))
 story.append(p(
     "<b>Analytical Observations from Scatter Geometry:</b><br/>"
-    "• <b>Batting Delta Leaders</b>: Jos Buttler (+12.4), Cameron Green (+9.2), Shreyas Iyer (+10.0), and Tim David (+8.8) sit furthest above the diagonal, demonstrating substantial performance elevation under pressure.<br/>"
-    "• <b>Elite Dual-Baselines</b>: Abhishek Sharma and Suryakumar Yadav possess exceptionally high baseline run values (+38.1 and +30.1), meaning their absolute pressure value remains elite even with modest delta uplift.<br/>"
-    "• <b>Bowling Dispersion</b>: Bowlers show tighter clustering around the diagonal, reflecting that defensive execution under pressure closely mirrors overall quality, with Varun Chakravarthy and Sunil Narine exhibiting the most favorable balance.",
+    "• <b>Batting Delta (Pressure vs Ordinary)</b>: All 10 top-10 batters lie above the diagonal (delta > 0), reflecting performance elevation under pressure. Listed in descending order of delta: <b>Jos Buttler (+12.4)</b>, <b>Shreyas Iyer (+10.0)</b>, <b>Cameron Green (+9.2)</b>, <b>Tim David (+8.8)</b>, Heinrich Klaasen (+6.4), Travis Head (+4.4), Rinku Singh (+4.4), Abhishek Sharma (+4.0), Phil Salt (+2.3), and Suryakumar Yadav (+1.0).<br/>"
+    "• <b>Bowling Delta and Baseline Shrinkage</b>: Most top-10 bowlers lie below the diagonal, and only <b>Ravindra Jadeja (+1.4)</b> lies above it. Heavy empirical-Bayes shrinkage toward each bowler's baseline contributes to this pattern, as small samples of pressure wickets pull posterior estimates toward ordinary career levels.<br/>"
+    "• <b>Baseline Anchoring</b>: High-baseline bowlers like Jasprit Bumrah (+22.9) and Sunil Narine (+16.7) deliver elite absolute pressure prevention (+16.0 and +14.6 post-shrunk value) even with negative deltas relative to their dominant ordinary-situation baselines.",
     S_BODY
 ))
 story.append(PageBreak())
@@ -837,28 +850,29 @@ story.append(PageBreak())
 story.extend(sec_header("7. Player Role Notes (Derived Strictly from Data)", "Objective Classification via Match Phase, Innings Context & Positional Distributions"))
 story.append(p(
     "<b>Phase Threshold Rule:</b> A player is classified as <i>death-overs focused</i> if ≥ 45% of pressure balls occurred in overs 16–20; "
-    "<i>powerplay focused</i> if ≥ 45% occurred in overs 1–6; and <i>middle-overs focused</i> if ≥ 50% occurred in overs 7–15.",
+    "<i>powerplay focused</i> if ≥ 45% occurred in overs 1–6; and <i>middle-overs focused</i> if ≥ 50% occurred in overs 7–15. "
+    "<b>Positional Specification:</b> Modal batting positions are computed across all balls faced in the evaluated matches (which establishes Tim David at position 6 and Rinku Singh at position 6, rather than pressure balls only where late-order entries can compress to position 5).",
     S_BODY
 ))
-story.append(sp(1))
+story.append(sp(0.6))
 
 story.append(Paragraph("<b>Top 10 Batters — Data-Derived Profiles</b>", S_SUB_H))
 bat_role_texts = [
-    "<b>Tim David</b> (Rank 1): 264 pressure balls (136 IPL / 128 T20I). Phase: 53.4% death / 41.3% middle / 5.3% powerplay (death-overs focused); 71.6% in chases (innings 2); modal batting position 5. Strike rate 193.2 under pressure vs 172.2 ordinarily.",
+    "<b>Tim David</b> (Rank 1): 264 pressure balls (136 IPL / 128 T20I). Phase: 53.4% death / 41.3% middle / 5.3% powerplay (death-overs focused); 71.6% in chases (innings 2); modal batting position 6. Strike rate 193.2 under pressure vs 172.2 ordinarily.",
     "<b>Shreyas Iyer</b> (Rank 2): 282 pressure balls (217 IPL / 65 T20I). Phase: 19.9% death / 56.7% middle / 23.4% powerplay (middle-overs focused); 59.6% in chases (innings 2); modal batting position 4. Strike rate 174.5 under pressure vs 150.2 ordinarily.",
-    "<b>Jos Buttler</b> (Rank 3): 245 pressure balls (160 IPL / 85 T20I). Phase: 18.8% death / 44.9% middle / 36.3% powerplay (multi-phase top order); 42.0% in chases (innings 2); modal batting position 3. Strike rate 198.0 under pressure vs 151.8 ordinarily.",
+    "<b>Jos Buttler</b> (Rank 3): 245 pressure balls (160 IPL / 85 T20I). Phase: 18.8% death / 44.9% middle / 36.3% powerplay (multi-phase top order); 42.0% in chases (innings 2); modal batting position 2. Strike rate 198.0 under pressure vs 151.8 ordinarily.",
     "<b>Heinrich Klaasen</b> (Rank 4): 230 pressure balls (195 IPL / 35 T20I). Phase: 24.3% death / 69.6% middle / 6.1% powerplay (middle-overs focused); 49.6% in chases (innings 2); modal batting position 5. Strike rate 170.9 under pressure vs 166.3 ordinarily.",
     "<b>Travis Head</b> (Rank 5): 118 pressure balls (88 IPL / 30 T20I). Phase: 0.0% death / 36.4% middle / 63.6% powerplay (powerplay focused); 37.3% in chases (innings 2); modal batting position 2. Strike rate 183.1 under pressure vs 176.0 ordinarily.",
     "<b>Abhishek Sharma</b> (Rank 6): 222 pressure balls (123 IPL / 99 T20I). Phase: 0.0% death / 40.1% middle / 59.9% powerplay (powerplay focused); 46.8% in chases (innings 2); modal batting position 2. Strike rate 192.8 under pressure vs 186.2 ordinarily.",
     "<b>Suryakumar Yadav</b> (Rank 7): 412 pressure balls (229 IPL / 183 T20I). Phase: 16.5% death / 60.0% middle / 23.5% powerplay (middle-overs focused); 56.3% in chases (innings 2); modal batting position 4. Strike rate 157.5 under pressure vs 168.3 ordinarily.",
     "<b>Phil Salt</b> (Rank 8): 140 pressure balls (63 IPL / 77 T20I). Phase: 10.0% death / 41.4% middle / 48.6% powerplay (powerplay focused); 55.7% in chases (innings 2); modal batting position 1. Strike rate 170.7 under pressure vs 170.8 ordinarily.",
     "<b>Cameron Green</b> (Rank 9): 206 pressure balls (112 IPL / 94 T20I). Phase: 10.7% death / 66.0% middle / 23.3% powerplay (middle-overs focused); 66.5% in chases (innings 2); modal batting position 4. Strike rate 172.3 under pressure vs 148.1 ordinarily.",
-    "<b>Rinku Singh</b> (Rank 10): 199 pressure balls (160 IPL / 39 T20I). Phase: 52.3% death / 43.7% middle / 4.0% powerplay (death-overs focused); 44.2% in chases (innings 2); modal batting position 5. Strike rate 154.3 under pressure vs 151.3 ordinarily."
+    "<b>Rinku Singh</b> (Rank 10): 199 pressure balls (160 IPL / 39 T20I). Phase: 52.3% death / 43.7% middle / 4.0% powerplay (death-overs focused); 44.2% in chases (innings 2); modal batting position 6. Strike rate 154.3 under pressure vs 151.3 ordinarily."
 ]
 for bt in bat_role_texts:
     story.append(Paragraph(f"• {bt}", S_ROLE))
 
-story.append(sp(2))
+story.append(sp(1.0))
 story.append(Paragraph("<b>Top 10 Bowlers — Data-Derived Profiles</b>", S_SUB_H))
 bowl_role_texts = [
     "<b>Varun Chakravarthy</b> (Rank 1): 300 pressure balls (203 IPL / 97 T20I). Phase: 18.0% death / 65.7% middle / 16.3% powerplay (middle-overs focused); 60.3% in chases (innings 2); bowling type: Right-arm Leg-Break. Economy 7.33 under pressure vs 8.10 ordinarily.",
@@ -884,7 +898,7 @@ story.append(p(
 ))
 
 limits = [
-    "<b>Weak Measurability of Pressure Skill</b>: As proven in Section 4.2 (r = 0.13 for batting, r = 0.11 for bowling economy), pressure performance has low split-half persistence. Ordinary form predicts pressure performance (r = 0.20 for batting, r = 0.14 for bowling) as well as or better than pressure form. Ranking differences between adjacent players should be treated as probability bands rather than absolute skill gaps.",
+    "<b>Weak Measurability of Pressure Skill</b>: As demonstrated in Section 4.3 (Table 4) (r = 0.13 for batting, r = 0.11 for bowling economy), pressure performance has low split-half persistence. Ordinary form predicts pressure performance (r = 0.20 for batting, r = 0.14 for bowling) as well as or better than pressure form. Ranking differences between adjacent players should be treated as probability bands rather than absolute skill gaps.",
     "<b>Bowling Volatility & Wicket Stochasticity</b>: Bowling outcomes exhibit extreme single-ball variance. The split-half persistence of pressure wickets is essentially zero (r = 0.03), requiring our model to shrink the wicket component almost fully toward the player's career baseline.",
     "<b>Asymmetry in Win-Probability Models</b>: The Innings 1 win-probability model is significantly weaker (AUC 0.6805, log-loss 0.6445) than the Innings 2 model (AUC 0.8915, log-loss 0.4127). First-innings leverage calculations carry greater uncertainty because final targets remain undefined.",
     "<b>Factual Sample Dispersions in Top 10</b>:<br/>"
@@ -892,7 +906,7 @@ limits = [
     "&nbsp;&nbsp;• <b>Heinrich Klaasen</b>: Holds the highest active IPL 2026 volume among top-10 batters (390 balls faced), whereas Jos Buttler faced 345 balls.<br/>"
     "&nbsp;&nbsp;• <b>Suryakumar Yadav</b>: Holds the largest IPL pressure ball sample among top-10 batters (229 balls), whereas Shreyas Iyer faced 217.<br/>"
     "&nbsp;&nbsp;• <b>Sunil Narine</b>: Holds the highest specification mean among bowlers (1.76) and enters the top 10 in 8 of 9 specifications.",
-    "<b>Subjective Opposition Weights</b>: The 1.0 / 0.8 / 0.4 tournament weights represent an expert analytical prior. While Specification 5 ('equalw') demonstrates core ranking stability, absolute score magnitudes shift under alternative weightings.",
+    "<b>Subjective Opposition Weights</b>: The 1.0 / 0.8 / 0.4 tournament weights represent analyst judgement. While Specification 5 ('equalw') demonstrates core ranking stability, absolute score magnitudes shift under alternative weightings.",
     "<b>Information Outside the Dataset</b>: The provided CSV files contain zero data on player nationality, overseas roster slots, auction purse allocations, physical fitness/injuries, franchise retentions, or Right-To-Match (RTM) options. <i>[assumption — not from data]</i>: Any real-world bidding strategy must overlay these operational constraints out-of-band."
 ]
 for lm in limits:
@@ -966,7 +980,6 @@ class NumberedCanvas(canvas.Canvas):
         self.setFillColor(C_GREY)
         # Header
         self.drawString(MARGIN, PAGE_H - 9*mm, "Rajasthan Royals SupeRR Selector Season 2 | Round 1 Methodology Dossier")
-        self.drawRightString(PAGE_W - MARGIN, PAGE_H - 9*mm, "Confidential Franchise Analytics")
         self.setStrokeColor(C_MID)
         self.setLineWidth(0.5)
         self.line(MARGIN, PAGE_H - 10.5*mm, PAGE_W - MARGIN, PAGE_H - 10.5*mm)
@@ -987,5 +1000,8 @@ doc = SimpleDocTemplate(
 )
 
 doc.build(story, canvasmaker=NumberedCanvas)
+import shutil
+shutil.copyfile(PDF_OUT, PDF_OUT_LEGACY)
 print(f"✓ PDF Generation Complete: {PDF_OUT}")
+print(f"✓ Mirrored to: {PDF_OUT_LEGACY}")
 print(f"  Final File Size: {os.path.getsize(PDF_OUT) / (1024*1024):.2f} MB")

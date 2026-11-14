@@ -1,24 +1,31 @@
 """
 verify_report.py - Mandatory automated verification of the generated PDF report.
 Performs:
- a) Extracts all text from RR_AuctionStrategy_Rigorous.pdf using pypdf.
- b) Checks that no forbidden words appear ("prompt", "expected ranking", "Antigravity").
+ a) Extracts all text from RR_AuctionStrategy_Rigorous_1.pdf (or path passed via CLI) using pypdf.
+ b) Checks that no forbidden words or phrases appear ("prompt", "expected ranking", "Antigravity", "Confidential Franchise Analytics", "perfectly balanced", "proves").
  c) Re-reads final_bat_filtered.csv / final_bowl_filtered.csv and asserts the names and order of both top-10 tables match exactly.
  d) Asserts the AUC/log-loss values, delivery counts (195,124 / 186,814 / 818), pressure share (14.2%) and split-half table equal computed values.
  e) Asserts Table 6b relabel 'Bowling avg (runs/wkt)'.
- f) Prints PASS/FAIL for each check.
+ f) Asserts Table 1b and 6b footnote presence.
+ g) Asserts Section 5 high confidence computed text and Section 7 modal positions (Tim David 6, Rinku Singh 6).
+ h) Prints PASS/FAIL for each check.
 """
-import sys, re
+import sys, os, re
 import pandas as pd
 import pypdf
 
-PDF_PATH = '/Users/vaibhavshukla/Desktop/RR Competition/RR_AuctionStrategy_Rigorous.pdf'
+DEFAULT_PDF = '/Users/vaibhavshukla/Desktop/RR Competition/RR_AuctionStrategy_Rigorous_1.pdf'
+PDF_PATH = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_PDF
+if not os.path.exists(PDF_PATH) and os.path.exists('/Users/vaibhavshukla/Desktop/RR Competition/RR_AuctionStrategy_Rigorous.pdf'):
+    PDF_PATH = '/Users/vaibhavshukla/Desktop/RR Competition/RR_AuctionStrategy_Rigorous.pdf'
+
 BUNDLE = '/tmp/repro_bundle/results'
 
 def run_verification():
     passed_all = True
     print("=" * 60)
-    print("RUNNING MANDATORY REPORT VERIFICATION (verify_report.py)")
+    print(f"RUNNING MANDATORY REPORT VERIFICATION (verify_report.py)")
+    print(f"Target PDF: {PDF_PATH}")
     print("=" * 60)
     
     # 1. Extract PDF text
@@ -35,15 +42,15 @@ def run_verification():
     else:
         print(f"  WARNING: Page count {num_pages} is outside strict 14-16 target range.")
     
-    # 2. Check forbidden words
-    forbidden = ["prompt", "expected ranking", "antigravity"]
+    # 2. Check forbidden words and phrases
+    forbidden = ["prompt", "expected ranking", "antigravity", "confidential franchise analytics", "perfectly balanced", "proves"]
     for word in forbidden:
         count = len(re.findall(r'\b' + re.escape(word) + r'\b', full_text_lower))
         if count > 0:
-            print(f"  FAIL: Forbidden word '{word}' found {count} times in PDF text!")
+            print(f"  FAIL: Forbidden word/phrase '{word}' found {count} times in PDF text!")
             passed_all = False
         else:
-            print(f"  PASS: Forbidden word '{word}' is completely absent (0 occurrences).")
+            print(f"  PASS: Forbidden word/phrase '{word}' is completely absent (0 occurrences).")
             
     # 3. Assert Top 10 Batters and Bowlers names & order
     bat_csv = pd.read_csv(f'{BUNDLE}/final_bat_filtered.csv').head(10)
@@ -125,6 +132,28 @@ def run_verification():
         print("  PASS: Table 6b correctly relabeled with 'Bowling avg (runs/wkt)'.")
     else:
         print("  FAIL: Table 6b relabel 'Bowling avg (runs/wkt)' not found in PDF!")
+        passed_all = False
+
+    # 6. Check Table 1b and 6b footnote
+    fn_text = "Table 1b counts all deliveries bowled under pressure (including wides and no-balls); Table 6b counts legal balls only."
+    if fn_text in full_text_norm:
+        print("  PASS: Table 1b and 6b footnote verified in PDF.")
+    else:
+        print("  FAIL: Table 1b and 6b footnote missing from PDF!")
+        passed_all = False
+
+    # 7. Check Section 5 High-Confidence computed text
+    if "No bowler qualifies" in full_text_norm and "Tim David" in full_text_norm and "Shreyas Iyer" in full_text_norm:
+        print("  PASS: Section 5 High-Confidence computed classification verified.")
+    else:
+        print("  FAIL: Section 5 High-Confidence computed classification missing!")
+        passed_all = False
+
+    # 8. Check Section 7 modal positions (Tim David 6, Rinku Singh 6)
+    if "Tim David" in full_text_norm and "modal batting position 6" in full_text_norm and "Rinku Singh" in full_text_norm:
+        print("  PASS: Section 7 modal batting position (pos 6 for David & Rinku) verified.")
+    else:
+        print("  FAIL: Section 7 modal batting positions missing or incorrect!")
         passed_all = False
         
     print("=" * 60)
